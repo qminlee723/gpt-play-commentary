@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>KOPIS 공연 데이터 뷰어</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>🎭 KOPIS 공연 정보</h1>
+    <p>아래 버튼을 누르면 최신 공연 데이터를 불러옵니다.</p>
+    <button id="loadBtn" type="button">데이터 불러오기</button>
+
+    <div id="result">
+      <h2>📡 로그</h2>
+      <pre
+        id="logOutput"
+        style="
+          background: #111;
+          color: #0f0;
+          padding: 1em;
+          height: 300px;
+          overflow-y: auto;
+        "
+      ></pre>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

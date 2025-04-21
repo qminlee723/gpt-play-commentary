@@ -17,36 +17,36 @@ GENRE_CODES = {
 }
 
 
-def collect_unique_ids(start_date: str, end_date: str) -> set:
+def collect_unique_ids(start_date: str, end_date: str, log=print) -> set:
     all_ids = set()
 
     for genre_name, code in GENRE_CODES.items():
-        print(f"[{genre_name}] 공연 ID 수집 중...")
+        log(f"[{genre_name}] 공연 ID 수집 중...")
         try:
             xml_data = fetch_performance_list(start_date, end_date, code)
             ids = parse_performance_ids(xml_data)
-            print(f"  → {len(ids)}개 수집됨")
+            log(f"  → {len(ids)}개 수집됨")
             all_ids.update(ids)
         except Exception as e:
-            print(f"  ❌ 오류 발생: {e}")
+            log(f"  ❌ 오류 발생: {e}")
         sleep(0.3)
 
-    print(f"\n총 중복 제거된 공연 ID 개수: {len(all_ids)}")
+    log(f"\n총 중복 제거된 공연 ID 개수: {len(all_ids)}")
     return all_ids
 
 
-def build_performance_dataset(mt20id_list: list[str]) -> list[dict]:
+def build_performance_dataset(mt20id_list: list[str], log=print) -> list[dict]:
     result = []
 
     for idx, mt20id in enumerate(mt20id_list, start=1):
         try:
-            print(f"[{idx}/{len(mt20id_list)}] 공연 ID: {mt20id} 상세 조회 중...")
+            log(f"[{idx}/{len(mt20id_list)}] 공연 ID: {mt20id} 상세 조회 중...")
             xml_data = fetch_performance_detail(mt20id)
             detail = parse_performance_detail(xml_data)
             if detail:
                 result.append(detail)
         except Exception as e:
-            print(f"  ❌ 오류: {e}")
+            log(f"  ❌ 오류: {e}")
         sleep(0.3)
 
     return result

@@ -5,7 +5,7 @@ def parse_performance_ids(xml_data: str) -> list[str]:
     root = ET.fromstring(xml_data)
     ids = []
 
-    for elem in root.findall("boxof"):
+    for elem in root.findall(".//boxof"):  
         mt20id = elem.findtext("mt20id")
         if mt20id:
             ids.append(mt20id)
@@ -14,6 +14,7 @@ def parse_performance_ids(xml_data: str) -> list[str]:
 
 
 def parse_performance_detail(xml_data: str) -> dict:
+
     """공연 상세 API 결과에서 필요한 정보만 추출"""
     root = ET.fromstring(xml_data)
     prf = root.find("db")

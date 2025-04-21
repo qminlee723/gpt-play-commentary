@@ -20,6 +20,7 @@ def fetch_performance_list(start_date: str, end_date: str, category_code: str = 
         params["area"] = area_code
 
     response = requests.get(url, params=params, timeout=10)
+
     if response.status_code != 200:
         raise Exception(f"API 요청 실패! 상태코드: {response.status_code}")
 

@@ -6,22 +6,48 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>🎭 KOPIS 공연 정보</h1>
-    <p>아래 버튼을 누르면 최신 공연 데이터를 불러옵니다.</p>
-    <button id="loadBtn" type="button">데이터 불러오기</button>
+    <h1>KOPIS 공연 정보</h1>
+    <ul>
+      <li>
+        <strong>공연 데이터 수집 버튼</strong>: 이전 수집에서 업데이트 된 데이터
+        목록을 수집, JSON으로 저장
+      </li>
+      <li>
+        <strong>GPT 요약 버튼</strong>: 수집된 공연 데이터(JSON)를 바탕으로
+        GPT에게 요약을 요청, csv로 저장
+      </li>
+    </ul>
+
+    <div style="margin-bottom: 1em">
+      <button id="loadBtn" type="button">📥 공연 데이터 수집</button>
+      <button id="summarizeBtn" type="button">📝 GPT 요약 실행</button>
+    </div>
 
     <div id="result">
-      <h2>📡 로그</h2>
+      <h2>📝 로그</h2>
       <pre
         id="logOutput"
         style="
           background: #111;
           color: #0f0;
           padding: 1em;
-          height: 300px;
+          height: 400px;
           overflow-y: auto;
         "
       ></pre>
+    </div>
+
+    <div id="downloadLinks">
+      <h2>📁 파일 목록</h2>
+    </div>
+
+    <div style="color: #aaaaaa; font-size: small; margin-top: 2em">
+      <p>
+        Crafted with 🤍 & GPT 4o by
+        <a href="https://github.com/qminlee723" style="color: #aaaaaa"
+          >Gyumin</a
+        >
+      </p>
     </div>
 
     <script src="script.js" defer></script>

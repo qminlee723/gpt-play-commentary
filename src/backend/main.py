@@ -9,7 +9,7 @@ EXISTING_IDS_PATH = os.path.join(DATA_DIR, "existing_ids.json")
 LOG_FILE_PATH = os.path.join(DATA_DIR, "log.txt")
 
 def main():
-
+    
     # 로그 초기화
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(LOG_FILE_PATH, "w", encoding="utf-8") as f:

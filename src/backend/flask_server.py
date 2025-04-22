@@ -6,8 +6,7 @@ from flask_cors import CORS
 import main
 from utils import LOG_FILE_PATH  # ✨ 이제 utils에서 경로 가져옴
 from pathlib import Path
-from gpt_api import process_and_save
-
+from gpt_api import process_and_save_batch, process_and_save
 
 # 현재 디렉토리 backend/를 모듈 경로에 추가
 sys.path.append(os.path.dirname(__file__))
@@ -55,7 +54,20 @@ def download_file(filename):
     
     return send_from_directory(data_dir, filename, as_attachment=True)
 
-
+@app.route("/summarize")
+def run_gpt_summary():
+    
+    process_and_save(
+        json_path="data/kopis_performances_20250421.json",
+        output_csv="data/gpt_test_summary.csv"
+    )
+    # 대용량은 일단 주석
+    # process_and_save_batch(
+    #     json_path="data/kopis_performances_20250421.json",
+    #     output_csv="data/gpt_summary.csv",
+    #     chunk_size=5
+    # )
+    return jsonify({"message": "GPT 요약 완료!"})
 
 
 if __name__ == "__main__":

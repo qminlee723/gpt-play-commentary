@@ -8,6 +8,7 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 EXISTING_IDS_PATH = os.path.join(DATA_DIR, "existing_ids.json")
 LOG_FILE_PATH = os.path.join(DATA_DIR, "log.txt")
 
+
 def main():
     
     # 로그 초기화

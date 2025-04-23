@@ -7,19 +7,38 @@ document.addEventListener("DOMContentLoaded", () => {
   logBox.textContent =
     "[공연 데이터 수집] 버튼을 클릭 후 ⭐️작업이 완료되면⭐️ 그 후에 GPT 요약 실행 버튼을 클릭 해 주세요\n";
 
-  loadBtn.addEventListener("click", async (e) => {
+  loadBtn.addEventListener("click", async () => {
+    let dotCount = 0;
+    let anim;
+
+    const startLoadingAnimation = () => {
+      anim = setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // 0 → 1 → 2 → 3 → 0 ...
+        const dots = ".".repeat(dotCount);
+        logBox.textContent = `📥 공연 데이터 수집 중${dots}`;
+      }, 500);
+    };
+
+    const stopLoadingAnimation = () => {
+      clearInterval(anim);
+    };
+
     try {
-      logBox.textContent = "📥 공연 데이터 수집 요청 중...\n";
+      startLoadingAnimation();
 
       const res = await fetch("http://127.0.0.1:5050/run");
       const data = await res.json();
 
-      // 수집 완료 후 로그를 다시 가져옴
       const log = await fetch("http://127.0.0.1:5050/log").then((res) =>
         res.text()
       );
+
+      stopLoadingAnimation();
       logBox.textContent = log;
+
+      await updateFileList(); // 파일 목록 갱신
     } catch (err) {
+      stopLoadingAnimation();
       logBox.textContent =
         "❌ 공연 호출 실패! Backend 서버가 켜졌는지 다시 한번 확인하세요. `python flask_server.py`\n";
       console.error(err);
@@ -68,3 +87,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     downloadDiv.innerHTML = "<p>⚠️ 파일 목록을 불러오지 못했습니다.</p>";
   }
 });
+
+async function updateFileList() {
+  const downloadDiv = document.getElementById("downloadLinks");
+  downloadDiv.innerHTML = "<h2>📁 파일 목록</h2>"; // 초기화
+
+  try {
+    const res = await fetch("http://127.0.0.1:5050/list-downloads");
+    const files = await res.json();
+
+    if (files.length === 0) {
+      downloadDiv.innerHTML += "<p>📂 다운로드 가능한 파일이 없습니다.</p>";
+      return;
+    }
+
+    const ul = document.createElement("ul");
+    files.forEach((file) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `http://127.0.0.1:5050/download/${file}`;
+      a.download = file;
+      a.textContent = `💾 ${file}`;
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+
+    downloadDiv.appendChild(ul);
+  } catch (err) {
+    console.error("파일 목록 로드 실패:", err);
+    downloadDiv.innerHTML += "<p>⚠️ 파일 목록을 불러오지 못했습니다.</p>";
+  }
+}

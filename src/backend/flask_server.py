@@ -1,10 +1,11 @@
-import sys
 import os
-import time
+import sys
+from datetime import datetime
+from glob import glob
 from flask import Flask, jsonify, Response, send_from_directory
 from flask_cors import CORS
 import main
-from utils import LOG_FILE_PATH  # ✨ 이제 utils에서 경로 가져옴
+from utils import LOG_FILE_PATH # 로그 파일 경로
 from pathlib import Path
 from gpt_api import process_and_save_batch, process_and_save
 
@@ -58,7 +59,7 @@ def download_file(filename):
     base_dir = os.path.dirname(__file__)  # src/backend
     data_dir = os.path.join(base_dir, "data")
     
-    # 디버그용 로그 찍기 (선택)
+    # 디버그용 로그
     file_path = os.path.join(data_dir, filename)
     print(f"[DEBUG] 다운로드 요청된 파일 경로: {file_path}")
     
@@ -67,15 +68,32 @@ def download_file(filename):
 @app.route("/summarize")
 def run_gpt_summary():
     
-    process_and_save(
-        json_path="data/kopis_performances_20250421.json",
-        output_csv="data/gpt_test_summary.csv"
-    )
+    # 1. 최신 JSON 파일 찾기
+    json_files = glob("data/kopis_*.json")
+    if not json_files:
+        return jsonify({"error": "No kopis JSON files found"}), 404
+
+    latest_json = max(json_files, key=os.path.getmtime)
+
+    # 2. 오늘 날짜로 CSV 이름 생성
+    today = datetime.now().strftime("%Y%m%d")
+    output_csv = f"data/gpt_summary_{today}.csv"
+
+    # 3. 요약 처리
+    try:
+        process_and_save(json_path=latest_json, output_csv=output_csv)
+        return jsonify({
+            "message": "GPT 요약 완료!",
+            "json_used": latest_json,
+            "csv_saved": output_csv
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
     # 대용량은 일단 주석
     # process_and_save_batch(
-    #     json_path="data/kopis_performances_20250421.json",
-    #     output_csv="data/gpt_summary.csv",
-    #     chunk_size=5
+    #     json_path=latest_json,
+    #     output_csv=output_csv,
     # )
     return jsonify({"message": "GPT 요약 완료!"})
 

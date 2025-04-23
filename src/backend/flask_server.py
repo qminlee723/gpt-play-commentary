@@ -11,8 +11,18 @@ from gpt_api import process_and_save_batch, process_and_save
 # 현재 디렉토리 backend/를 모듈 경로에 추가
 sys.path.append(os.path.dirname(__file__))
 
-app = Flask(__name__)
+# 정적 파일 위치 지정
+app = Flask(
+    __name__,
+    static_folder="../frontend",  # frontend 경로 조정
+    static_url_path=""
+)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# 기본 라우트: index.html 반환
+@app.route("/")
+def serve_index():
+    return send_from_directory(app.static_folder, "index.html")
 
 @app.route("/run")
 def run_kopis():

@@ -4,29 +4,72 @@ document.addEventListener("DOMContentLoaded", () => {
   const summarizeBtn = document.getElementById("summarizeBtn");
   const downloadDiv = document.getElementById("downloadLinks");
 
+  function getYesterdayDateString() {
+    const today = new Date();
+    today.setDate(today.getDate() - 1);
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  // 어제 날짜로 startDate와 endDate 초기값 세팅
+  const yesterdayStr = getYesterdayDateString();
+  document.getElementById("startDate").value = yesterdayStr;
+  // document.getElementById("endDate").value = yesterdayStr;
+  let previousLog = "";
+  let loadingMessage = "";
+  let logInterval;
+  let anim;
+
   // 초기화 메시지
   logBox.textContent =
     "[공연 데이터 수집] 버튼을 클릭 후 ⭐️작업이 완료되면⭐️ 그 후에 GPT 요약 실행 버튼을 클릭 해 주세요\n";
 
+  const startLoadingAnimation = () => {
+    let dotCount = 0;
+    loadingMessage = "📥 공연 데이터 수집 중";
+
+    anim = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      const dots = ".".repeat(dotCount);
+      loadingMessage = `📥 공연 데이터 수집 중${dots}`;
+      logBox.textContent = `${loadingMessage}\n\n${previousLog}`;
+      logBox.scrollTop = logBox.scrollHeight;
+    }, 500);
+  };
+
+  const stopLoadingAnimation = () => {
+    clearInterval(anim);
+  };
+
+  const startLogFetching = () => {
+    logInterval = setInterval(async () => {
+      try {
+        const log = await fetch("http://127.0.0.1:5050/log").then((res) =>
+          res.text()
+        );
+
+        if (log !== previousLog) {
+          previousLog = log;
+          logBox.textContent = `${loadingMessage}\n\n${previousLog}`;
+          logBox.scrollTop = logBox.scrollHeight;
+        }
+      } catch (err) {
+        console.error("로그 업데이트 실패:", err);
+      }
+    }, 1000);
+  };
+
+  const stopLogFetching = () => {
+    clearInterval(logInterval);
+  };
+
   // 공연 데이터 수집 버튼
   loadBtn.addEventListener("click", async () => {
-    let dotCount = 0;
-    let anim;
-
-    const startLoadingAnimation = () => {
-      anim = setInterval(() => {
-        dotCount = (dotCount + 1) % 4;
-        const dots = ".".repeat(dotCount);
-        logBox.textContent = `📥 공연 데이터 수집 중${dots}`;
-      }, 500);
-    };
-
-    const stopLoadingAnimation = () => {
-      clearInterval(anim);
-    };
-
     try {
       startLoadingAnimation();
+      startLogFetching();
 
       const start_date = document
         .getElementById("startDate")
@@ -38,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!start_date || !end_date) {
         alert("시작일과 종료일을 선택해주세요!");
         stopLoadingAnimation();
+        stopLogFetching();
         return;
       }
 
@@ -51,16 +95,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      const log = await fetch("http://127.0.0.1:5050/log").then((res) =>
+      stopLoadingAnimation();
+      stopLogFetching();
+
+      const finalLog = await fetch("http://127.0.0.1:5050/log").then((res) =>
         res.text()
       );
-
-      stopLoadingAnimation();
-      logBox.textContent = log;
+      previousLog = finalLog;
+      logBox.textContent = `${loadingMessage}\n\n${previousLog}`;
+      logBox.scrollTop = logBox.scrollHeight;
 
       await updateFileList();
     } catch (err) {
       stopLoadingAnimation();
+      stopLogFetching();
       logBox.textContent =
         "❌ 공연 호출 실패! Backend 서버가 켜졌는지 다시 한번 확인하세요. `python flask_server.py`\n";
       console.error(err);

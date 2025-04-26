@@ -9,16 +9,14 @@ EXISTING_IDS_PATH = os.path.join(DATA_DIR, "existing_ids.json")
 LOG_FILE_PATH = os.path.join(DATA_DIR, "log.txt")
 
 
-def main():
+def main(start_date: str, end_date: str):
     
     # 로그 초기화
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(LOG_FILE_PATH, "w", encoding="utf-8") as f:
         f.write("[🚀 KOPIS 공연 수집 로그 시작]\n")
-
-    two_days_ago = datetime.today() - timedelta(days=2)
-    date_str = two_days_ago.strftime("%Y%m%d")
-    start_date = end_date = date_str
+        f.write(f"시작일: {start_date}, 종료일: {end_date}\n")
+        f.write("========================================\n")   
 
     log("🎬 공연 ID 수집 시작...")
     new_ids = collect_unique_ids(start_date, end_date)
@@ -37,6 +35,7 @@ def main():
     log("\n📋 공연 상세 정보 수집 중...")
     dataset = build_performance_dataset(list(diff_ids))
 
+    today = datetime.now().strftime("%Y%m%d")
     output_file = os.path.join(DATA_DIR, f"kopis_performances_{date_str}.json")
     save_json(dataset, output_file)
 

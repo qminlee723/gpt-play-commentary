@@ -20,19 +20,15 @@ GENRE_CODES = {
 def collect_unique_ids(start_date: str, end_date: str) -> set:
     all_ids = set()
 
+    print(f"공연 ID 수집 중...")
 
-    for genre_name, code in GENRE_CODES.items():
-        print(f"[{genre_name}] 공연 ID 수집 중...")
-        try:
-            xml_data = fetch_performance_list(start_date, end_date, code)
-            ids = parse_performance_ids(xml_data)
-
-
-            log(f"[{genre_name}] → {len(ids)}개 수집됨")
-            all_ids.update(ids)
-        except Exception as e:
-            log(f"  ❌ 오류 발생: {e}")
-        sleep(0.3)
+    try:
+        ids = fetch_performance_list(start_date, end_date)
+        log(f"총 {len(ids)}개 수집됨")
+        all_ids.update(ids)
+        
+    except Exception as e:
+        log(f"  ❌ 오류 발생: {e}")
 
     log(f"\n총 중복 제거된 공연 ID 개수: {len(all_ids)}")
     return all_ids

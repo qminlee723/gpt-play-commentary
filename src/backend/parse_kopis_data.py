@@ -1,11 +1,12 @@
 import xml.etree.ElementTree as ET
 
 def parse_performance_ids(xml_data: str) -> list[str]:
-    """boxoffice API 결과에서 공연 ID(mt20id) 리스트 추출"""
+    """전체 공연 목록 조회 API 결과에서 공연 ID(mt20id) 리스트 추출"""
     root = ET.fromstring(xml_data)
     ids = []
 
-    for elem in root.findall(".//boxof"):  
+    for elem in root.findall(".//db"):  
+
         mt20id = elem.findtext("mt20id")
         if mt20id:
             ids.append(mt20id)

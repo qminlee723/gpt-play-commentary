@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 from glob import glob
-from flask import Flask, jsonify, Response, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import main
 from utils import LOG_FILE_PATH # 로그 파일 경로
@@ -25,10 +25,17 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 def serve_index():
     return send_from_directory(app.static_folder, "index.html")
 
-@app.route("/run")
+@app.route("/run", methods=["POST"])
 def run_kopis():
     try:
-        main.main()
+        data = request.get_json()
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
+
+        if not start_date or not end_date:
+            return jsonify({"status": "error", "message": "start_date와 end_date를 제공해야 합니다."}), 400
+        
+        main.main(start_date=start_date, end_date=end_date)
         return jsonify({"status": "ok", "message": "공연 데이터 수집 완료!"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
@@ -95,6 +102,7 @@ def run_gpt_summary():
     #     json_path=latest_json,
     #     output_csv=output_csv,
     # )
+    
     return jsonify({"message": "GPT 요약 완료!"})
 
 

@@ -46,7 +46,7 @@ def list_downloads():
     # kopis_ 로 시작하고 .json / .csv 로 끝나는 파일 필터링
     downloadable_files = [
         f for f in files
-        if f.startswith("kopis_") and (f.endswith(".json") or f.endswith(".csv"))
+        if f.endswith(".csv") or f.startswith("kopis_") and (f.endswith(".json"))
     ]
 
     # 파일명을 기준으로 내림차순 정렬 (최신 먼저)

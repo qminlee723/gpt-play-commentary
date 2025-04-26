@@ -7,6 +7,7 @@
   </head>
   <body>
     <h1>KOPIS 공연 정보</h1>
+
     <ul>
       <li>
         <strong>공연 데이터 수집 버튼</strong>: 이전 수집에서 업데이트 된 데이터
@@ -17,6 +18,13 @@
         GPT에게 요약을 요청, csv로 저장
       </li>
     </ul>
+
+    <div style="margin-bottom: 1em">
+      <label for="startDate">시작 날짜:</label>
+      <input type="date" id="startDate" value="2025-01-01" />
+      <label for="endDate">종료 날짜:</label>
+      <input type="date" id="endDate" value="2025-12-31" />
+    </div>
 
     <div style="margin-bottom: 1em">
       <button id="loadBtn" type="button">📥 공연 데이터 수집</button>

@@ -3,24 +3,10 @@ from parse_kopis_data import parse_performance_ids, parse_performance_detail
 from time import sleep
 from utils import log
 
-GENRE_CODES = {
-    "연극": "AAAA",
-    "뮤지컬": "GGGA",
-    "서양음악(클래식)": "CCCA",
-    "한국음악(국악)": "CCCC",
-    "대중음악": "CCCD",
-    "무용(서양/한국무용)": "BBBC",
-    "대중무용": "BBBR",
-    "서커스/마술": "EEEB",
-    "복합": "EEEA",
-    "아동": "KID",
-    "오픈런": "OPEN"
-}
-
 def collect_unique_ids(start_date: str, end_date: str) -> set:
     all_ids = set()
 
-    print(f"공연 ID 수집 중...")
+    log(f"🎬 공연 ID 수집 시작: {start_date} ~ {end_date}")
 
     try:
         ids = fetch_performance_list(start_date, end_date)

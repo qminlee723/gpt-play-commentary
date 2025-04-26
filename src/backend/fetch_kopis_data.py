@@ -2,6 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from parse_kopis_data import parse_performance_ids
+from utils import log
 
 # .env 불러오기
 load_dotenv()
@@ -12,6 +13,7 @@ def fetch_performance_list(start_date: str, end_date: str) -> list[str]:
     all_ids = set()
     cpage = 1
     rows = 100
+    collected_count = 0
     
     while True:
         params = {
@@ -32,8 +34,12 @@ def fetch_performance_list(start_date: str, end_date: str) -> list[str]:
 
         if not ids:
             break
-        
+
         all_ids.update(ids)
+        collected_count += len(ids) 
+        
+        log(f"📄 {cpage}페이지 - 📈 총 {collected_count}개 공연 ID 수집 완료")
+
         cpage += 1 
 
     return all_ids

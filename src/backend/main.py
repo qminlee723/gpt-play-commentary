@@ -36,7 +36,7 @@ def main(start_date: str, end_date: str):
     dataset = build_performance_dataset(list(diff_ids))
 
     today = datetime.now().strftime("%Y%m%d")
-    output_file = os.path.join(DATA_DIR, f"kopis_performances_{date_str}.json")
+    output_file = os.path.join(DATA_DIR, f"kopis_performances_{today}.json")
     save_json(dataset, output_file)
 
     updated_ids = existing_ids.union(new_ids)

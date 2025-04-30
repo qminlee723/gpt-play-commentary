@@ -24,7 +24,7 @@ def build_performance_dataset(mt20id_list: list[str]) -> list[dict]:
 
     for idx, mt20id in enumerate(mt20id_list, start=1):
         try:
-            print(f"[{idx}/{len(mt20id_list)}] 공연 ID: {mt20id} 상세 조회 중...")
+            log(f"[{idx}/{len(mt20id_list)}] 공연 ID: {mt20id} 상세 조회 중...")
             xml_data = fetch_performance_detail(mt20id)
             detail = parse_performance_detail(xml_data)
             if detail:

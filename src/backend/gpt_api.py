@@ -3,10 +3,9 @@ from openai import OpenAIError, BadRequestError
 import json
 import csv
 import os
-import requests
 from PIL import Image
 from io import BytesIO
-import pytesseract
+from utils import log
 from time import sleep
 from gpt_prompt import build_summary_prompt
 
@@ -20,22 +19,25 @@ def generate_summary(performance):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": "당신은 공연 정보를 요약해주는 친절한 전문가입니다."},
+                {"role": "user", "content": prompt}
+                ],
             temperature=0.7
         )
         return response.choices[0].message.content
     
     except BadRequestError as e:
-        print(f"[요청 오류] {performance.get('mt20id')}: {e}")
+        log(f"[요청 오류] {performance.get('mt20id')}: {e}")
         return "요청 오류로 요약 실패"
     
     except OpenAIError as e:
-        print(f"[GPT 오류] {performance.get('mt20id')}: {e}")
+        log(f"[GPT 오류] {performance.get('mt20id')}: {e}")
         return "GPT 오류 발생"
     
     except Exception as e:
-        print(f"[기타 오류] {performance.get('mt20id')}: {e}")
+        log(f"[기타 오류] {performance.get('mt20id')}: {e}")
         return "오류 발생"
 
 # ✅ 단건 테스트용
@@ -45,17 +47,17 @@ def process_and_save(json_path, output_csv):
 
     summaries = []
     for i, item in enumerate(data[:3]):
-        print(f"{i+1}/{len(data)} 처리 중: {item['prfnm']}")
+        log(f"{i+1}/{len(data)} 처리 중: {item['prfnm']}")
+
         summary = generate_summary(item)
         summaries.append({"공연 ID": item["mt20id"], "공연 요약": summary})
-        sleep(2)
 
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["공연 ID", "공연 요약"])
         writer.writeheader()
         writer.writerows(summaries)
 
-    print(f"\n✅ 단건 요약 저장 완료 → {output_csv}")
+    log(f"\n✅ 단건 요약 저장 완료 → {output_csv}")
 
 # ✅ 배치 처리용
 def process_and_save_batch(json_path, output_csv, chunk_size=10):
@@ -78,7 +80,7 @@ def process_and_save_batch(json_path, output_csv, chunk_size=10):
 
     all_rows = []
     for i, chunk in enumerate(chunk_list(data, chunk_size)):
-        print(f"\n🧠 GPT 요청 {i+1}차 (총 {len(chunk)}개)")
+        log(f"\n🧠 GPT 요청 {i+1}차 (총 {len(chunk)}개)")
         prompts = []
         for perf in chunk:
             prompts.append(build_summary_prompt(perf))
@@ -94,16 +96,14 @@ def process_and_save_batch(json_path, output_csv, chunk_size=10):
             gpt_output = response.choices[0].message.content
             parsed_rows = parse_gpt_table(gpt_output)
             all_rows.extend(parsed_rows)
-            print(f"✅ 요약 {len(parsed_rows)}개 완료")
+            log(f"✅ 요약 {len(parsed_rows)}개 완료")
             
         except BadRequestError as e:
-            print(f"[요청 오류 - 배치 {i+1}] {e}")
+            log(f"[요청 오류 - 배치 {i+1}] {e}")
         except OpenAIError as e:
-            print(f"[GPT 오류 - 배치 {i+1}] {e}")
+            log(f"[GPT 오류 - 배치 {i+1}] {e}")
         except Exception as e:
-            print(f"[기타 오류 - 배치 {i+1}] {e}")
-
-        sleep(2)
+            log(f"[기타 오류 - 배치 {i+1}] {e}")
 
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["공연 ID", "공연 요약"])

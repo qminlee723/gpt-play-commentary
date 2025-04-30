@@ -68,13 +68,16 @@ def download_file(filename):
     
     # 디버그용 로그
     file_path = os.path.join(data_dir, filename)
-    print(f"[DEBUG] 다운로드 요청된 파일 경로: {file_path}")
+    # print(f"[DEBUG] 다운로드 요청된 파일 경로: {file_path}")
     
     return send_from_directory(data_dir, filename, as_attachment=True)
 
 @app.route("/summarize")
 def run_gpt_summary():
     
+    with open(LOG_FILE_PATH, "w", encoding="utf-8") as f:
+        f.write("[🧠 GPT 요약 시작]\n")
+
     # 1. 최신 JSON 파일 찾기
     json_files = glob("data/kopis_*.json")
     if not json_files:

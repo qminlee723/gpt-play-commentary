@@ -91,7 +91,7 @@ def run_gpt_summary():
 
     # 3. 요약 처리
     try:
-        process_and_save(json_path=latest_json, output_csv=output_csv)
+        process_and_save_batch(json_path=latest_json, output_csv=output_csv, chunk_size=10)
         return jsonify({
             "message": "GPT 요약 완료!",
             "json_used": latest_json,

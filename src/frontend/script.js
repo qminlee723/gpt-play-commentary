@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const startLoadingAnimation = () => {
     let dotCount = 0;
-    loadingMessage = "📥 공연 데이터 수집 중";
+    // loadingMessage = "📥 공연 데이터 수집 중";
 
     anim = setInterval(() => {
       dotCount = (dotCount + 1) % 4;
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (log !== previousLog) {
           previousLog = log;
-          logBox.textContent += `${loadingMessage}\n\n${previousLog}`;
+          logBox.textContent = `${loadingMessage}\n\n${previousLog}`;
           logBox.scrollTop = logBox.scrollHeight;
         }
       } catch (err) {
@@ -80,9 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 공연 데이터 수집 버튼
   loadBtn.addEventListener("click", async () => {
-
     loadBtn.disabled = true;
-    loadBtn.textContent = "⏳ 수집중..."
+    loadBtn.textContent = "⏳ 수집중...";
 
     try {
       startLoadingAnimation();
@@ -114,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       stopLoadingAnimation();
       stopLogFetching();
-      
 
       const finalLog = await fetch("http://127.0.0.1:5050/log").then((res) =>
         res.text()
@@ -132,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error(err);
     } finally {
       loadBtn.disabled = false;
-      loadBtn.textContent = "📥 공연 데이터 수집"
+      loadBtn.textContent = "📥 공연 데이터 수집";
     }
   });
 
@@ -140,13 +138,11 @@ document.addEventListener("DOMContentLoaded", () => {
   summarizeBtn?.addEventListener("click", async () => {
     // logBox.textContent += "\n[🧠 GPT 요약 요청 중...]\n";
 
-
     summarizeBtn.disabled = true;
-    summarizeBtn.textContent = "⏳ 요약중..."
+    summarizeBtn.textContent = "⏳ 요약중...";
 
-    
     try {
-      startSummarizingAnimation()
+      startSummarizingAnimation();
       startLogFetching();
 
       const res = await fetch("http://127.0.0.1:5050/summarize");
@@ -163,8 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     stopLogFetching();
     stopLoadingAnimation();
-
-
   });
 
   // 파일 목록 업데이트 함수

@@ -18,7 +18,7 @@ def generate_summary(performance):
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": "당신은 공연 정보를 요약해주는 친절한 전문가입니다."},
                 {"role": "user", "content": prompt}
